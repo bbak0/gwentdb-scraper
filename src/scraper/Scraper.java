@@ -1,11 +1,11 @@
 package scraper;
 
 import java.awt.Image;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.imageio.ImageIO;
@@ -13,8 +13,7 @@ import javax.imageio.ImageIO;
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-import java.sql.*;	
+import org.jsoup.select.Elements;	
 
 public class Scraper implements Runnable{
 	
@@ -113,7 +112,7 @@ public class Scraper implements Runnable{
 			boolean isSiege = laneInfo.contains("Siege");
 			boolean isEvent = laneInfo.contains("Event");
 			
-			Image picture = getPicture(currentWebsite);
+			BufferedImage picture = getPicture(currentWebsite);
 			String cardText = currentWebsite.select(".card-abilities").text();
 			String flavorText = currentWebsite.select(".sw-card-flavor-text").text();
 			
@@ -122,11 +121,13 @@ public class Scraper implements Runnable{
 						isSiege, isEvent,picture,cardText,flavorText));
 			
 		}
+		// Inform DB manager no more cards are being added
+		DatabaseManager.endProcess();
 		
 	}
 	
 	//returns card picture from current website
-	Image getPicture(Document website){
+	BufferedImage getPicture(Document website){
 		
 		Elements pngs = website.select("img[src$=.png]");
 		Element picture;
@@ -140,7 +141,7 @@ public class Scraper implements Runnable{
 		
 		//get image's url
 		URL imageLink = null;
-		Image out = null;
+		BufferedImage out = null;
 		
 		try {
 			imageLink = new URL(picture.attr("src"));

@@ -4,8 +4,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class MainClass {
 
-	static String dbPath;
-	static String dbName;
+	static String dbPath = "C:/sqlite/db/";
+	static String dbName = "test.sqlite";
 	public static ConcurrentLinkedQueue<Card> cardList = new ConcurrentLinkedQueue<Card>();
 	
 	public static void main(String[] args) {
