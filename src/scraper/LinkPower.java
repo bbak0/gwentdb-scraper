@@ -18,4 +18,30 @@ public class LinkPower {
 		this.loyal = loyal;
 	}
 
+	public String getLink() {
+		return link;
+	}
+
+	public void setLink(String link) {
+		this.link = link;
+	}
+
+	public int getPower() {
+		return power;
+	}
+
+	public void setPower(int power) {
+		this.power = power;
+	}
+
+	public Boolean getLoyal() {
+		return loyal;
+	}
+
+	public void setLoyal(Boolean loyal) {
+		this.loyal = loyal;
+	}
+	
+	
+
 }

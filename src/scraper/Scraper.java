@@ -1,7 +1,13 @@
 package scraper;
 
+import java.awt.Image;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+
+import javax.imageio.ImageIO;
+
 import org.jsoup.*;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -24,6 +30,7 @@ public class Scraper {
 	String dbName;
 
 	
+	@SuppressWarnings("unused")
 	void getCardsURLs() throws IOException{
 		
 			// connect to the first page of the cards collection
@@ -79,22 +86,69 @@ public class Scraper {
 			System.out.println("done");
 	}
 	
+	@SuppressWarnings("unused")
 	void getAllCardDefinitions() throws IOException{
-		
-		for (String page : cardPages){
+		System.out.println("start");
+		for (LinkPower link : cardPagesWithPower){
 			
 			// Generate proper link to the card page and download its contents
-			String fullLink = baseCardURL + page;
+			String fullLink = baseCardURL + link.getLink();
 			Document currentWebsite = Jsoup.connect(fullLink).get();
 			
-			// Get values for card;
+			// Get values for card
+			String name = currentWebsite.select("div.card-name h1").html();
+			String type = currentWebsite.select("div.card-type a").html();
+			String faction = currentWebsite.select(".faction-link").html();
+			Boolean loyalty = link.getLoyal();
+			int power = link.getPower();
+			String rarity = currentWebsite.select("card-rarity span").html();
 			
+			//logic used to determine lane
+			String laneInfo = currentWebsite.select("card-row").html();
+			boolean isMelee = laneInfo.contains("Melee");
+			boolean isRanged = laneInfo.contains("Ranged");
+			boolean isSiege = laneInfo.contains("Siege");
+			boolean isEvent = laneInfo.contains("Event");
+			
+			Image picture = getPicture(currentWebsite);
+			String cardText = currentWebsite.select("card-abilities").text();
+			String flavorText = currentWebsite.select("sw-card-flavor-text").text();
 			
 			// Create and fill empty card definition
 			
-			
 		}
 		
+	}
+	
+	//returns card picture from current website
+	Image getPicture(Document website){
+		
+		Elements pngs = website.select("img[src$=.png]");
+		Element picture;
+		
+		//chooses appropriate picture according to the setting
+		if (getHighResImages){
+			picture = pngs.get(1);
+		} else {
+			picture = pngs.get(0);
+		}
+		
+		//get image's url
+		URL imageLink = null;
+		Image out = null;
+		
+		try {
+			imageLink = new URL(picture.attr("src"));
+			out = ImageIO.read(imageLink);
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return out;
 	}
 	
 	void createNewDatabase(){
@@ -104,6 +158,7 @@ public class Scraper {
 	void run(){
 		try {
 			getCardsURLs();
+			getAllCardDefinitions();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
