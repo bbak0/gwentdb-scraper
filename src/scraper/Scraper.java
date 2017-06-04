@@ -101,20 +101,21 @@ public class Scraper {
 			String faction = currentWebsite.select(".faction-link").html();
 			Boolean loyalty = link.getLoyal();
 			int power = link.getPower();
-			String rarity = currentWebsite.select("card-rarity span").html();
+			String rarity = currentWebsite.select(".card-rarity span").html();
 			
 			//logic used to determine lane
-			String laneInfo = currentWebsite.select("card-row").html();
+			String laneInfo = currentWebsite.select(".card-row").html();
 			boolean isMelee = laneInfo.contains("Melee");
 			boolean isRanged = laneInfo.contains("Ranged");
 			boolean isSiege = laneInfo.contains("Siege");
 			boolean isEvent = laneInfo.contains("Event");
 			
 			Image picture = getPicture(currentWebsite);
-			String cardText = currentWebsite.select("card-abilities").text();
-			String flavorText = currentWebsite.select("sw-card-flavor-text").text();
+			String cardText = currentWebsite.select(".card-abilities").text();
+			String flavorText = currentWebsite.select(".sw-card-flavor-text").text();
 			
 			// Create and fill empty card definition
+			
 			
 		}
 		
