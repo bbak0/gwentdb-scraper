@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.imageio.ImageIO;
 
@@ -14,20 +16,22 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import java.sql.*;	
 
-public class Scraper {
+public class Scraper implements Runnable{
+	
+	ConcurrentLinkedQueue<Card> cardList;
+	
+	public Scraper(ConcurrentLinkedQueue<Card> list){
+		this.cardList = list;
+	}
 	
 	ArrayList<String> cardPages = new ArrayList<String>();
-	ArrayList<Integer> cardPower = new ArrayList<Integer>();
 	ArrayList<LinkPower> cardPagesWithPower = new ArrayList<LinkPower>();
-	
-	ArrayList<Card> cardList = new ArrayList<Card>();
+	//LinkedList<Card> cardList = new LinkedList<Card>();
 	
 	final String startSite = "http://www.gwentdb.com/cards?filter-display=1";
 	final String baseURL = "http://www.gwentdb.com/cards?filter-display=1&page=";
 	final String baseCardURL = "http://www.gwentdb.com/cards";
 	final boolean getHighResImages = false;
-	String dbPath;
-	String dbName;
 
 	
 	@SuppressWarnings("unused")
@@ -88,7 +92,6 @@ public class Scraper {
 	
 	@SuppressWarnings("unused")
 	void getAllCardDefinitions() throws IOException{
-		System.out.println("start");
 		for (LinkPower link : cardPagesWithPower){
 			
 			// Generate proper link to the card page and download its contents
@@ -114,8 +117,9 @@ public class Scraper {
 			String cardText = currentWebsite.select(".card-abilities").text();
 			String flavorText = currentWebsite.select(".sw-card-flavor-text").text();
 			
-			// Create and fill empty card definition
-			
+			// Create and fill empty card definition, then add it to queue
+			cardList.add(new Card(name, type, faction, loyalty, power, rarity, isMelee, isRanged,
+						isSiege, isEvent,picture,cardText,flavorText));
 			
 		}
 		
@@ -156,7 +160,7 @@ public class Scraper {
 		
 	}
 	
-	void run(){
+	public void run(){
 		try {
 			getCardsURLs();
 			getAllCardDefinitions();
@@ -164,12 +168,6 @@ public class Scraper {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	
-	
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		new Scraper().run();
 	}
 
 }
