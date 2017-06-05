@@ -60,7 +60,7 @@ public class DatabaseManager implements Runnable {
                 + "	isEvent integer,\n"
                 + "	CardText text,\n"
                 + "	FlavorText text,\n"
-                + "	Picture blob,\n"
+                + "	Picture blob\n"
                 + ");";
 		
 		try (Connection conn = this.connect();
@@ -74,8 +74,8 @@ public class DatabaseManager implements Runnable {
 	void insertCard(Card card){
 		
 		String sql = "INSERT INTO Cards(Name, Faction, Loyalty, Power, Rarity, "
-				+ "isMelee, isRanged, isSiege, isEvent, CardText, FlavorText"
-				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+				+ "isMelee, isRanged, isSiege, isEvent, CardText, FlavorText, Picture) "
+				+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 		
 		 try (Connection conn = this.connect();
 	                PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -91,7 +91,7 @@ public class DatabaseManager implements Runnable {
 			 	pstmt.setString(10, card.getCardText());
 			 	pstmt.setString(11, card.getFlavorText());
 			 	pstmt.setBytes(12, card.getPictureByteArray());
-			 	pstmt.executeUpdate(sql);			 	
+			 	pstmt.execute();			 	
 			 	
 	        } catch (SQLException e) {
 	            System.out.println(e.getMessage());
@@ -105,13 +105,16 @@ public class DatabaseManager implements Runnable {
 	public void run(){
 		// create db and table
 		connect();
-		//removeExistingContent();
+		removeExistingContent();
 		createTable();
+		int i = 1;
 
-		while (!finished){
+		while (!finished || !cardList.isEmpty()){
 			
 			if (!cardList.isEmpty()){
 				insertCard(cardList.poll());
+				System.out.println("saved card "+i);
+				i++;
 			} else {
 				try {
 					Thread.sleep(10);
